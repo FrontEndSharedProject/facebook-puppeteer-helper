@@ -2,8 +2,10 @@
   "name": "facebook-puppeteer-helper",
   "main": "./dist/index.js",
   "private": false,
-  "version": "0.0.1",
-  "files": ["dist"],
+  "version": "0.0.2",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -11,5 +13,8 @@
   },
   "devDependencies": {
     "vite": "^4.2.0"
+  },
+  "dependencies": {
+    "lodash-es": "^4.17.21"
   }
 }
