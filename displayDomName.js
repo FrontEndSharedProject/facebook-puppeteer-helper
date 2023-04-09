@@ -246,7 +246,7 @@ import { throttle } from 'lodash-es';
                 moduleName = nameMatchRes[name];
             }
             else if (nameMatchRes[name] !== false) {
-                const res = name.match(/\[from\s(.*?)(?<!Provider|Context)\.react\]/);
+                const res = name.match(/\[from\s(.*?)\.react\]/);
                 if (res && res[1]) {
                     moduleName = res[1];
                     nameMatchRes[name] = res ? res[1] : false;
