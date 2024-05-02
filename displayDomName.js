@@ -246,7 +246,7 @@ import { throttle } from 'lodash-es';
                 moduleName = nameMatchRes[name];
             }
             else if (nameMatchRes[name] !== false) {
-                const res = name.match(/\[from\s(.*?)\.react\]/);
+                const res = name.match(/\[from\s(.*?)(\.react)?\]/);
                 if (res && res[1]) {
                     moduleName = res[1];
                     nameMatchRes[name] = res ? res[1] : false;
@@ -261,9 +261,18 @@ import { throttle } from 'lodash-es';
                     }
                     if (!classList.includes(moduleName)) {
                         classList.push(moduleName);
-                        cache.set(nodes[0], classList);
                         nodes[0][`__props`] = nodes[0][`__props`] || {};
                         nodes[0][`__props`][moduleName] = node.memoizedProps;
+
+                        //  将 RelayFBMatchContainer 匹配到的类型添加到 class 上面
+                        if (
+                          moduleName === "RelayFBMatchContainer" &&
+                          node.memoizedProps?.match?.__typename
+                        ) {
+                            classList.push(node.memoizedProps?.match?.__typename);
+                        }
+
+                        cache.set(nodes[0], classList);
                     }
                 }
             }
