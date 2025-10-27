@@ -2,11 +2,9 @@ import { throttle } from 'lodash-es';
 
 (() => {
     if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
-        console.log('⚠️ React DevTools Global Hook already exists, script will exit');
         return;
     }
     
-    console.log('🚀 Initializing React DevTools Display Name Helper');
     
     // 更新的 ReactTypeOfWork 枚举，基于最新的 React DevTools
     const ReactTypeOfWork = {
@@ -261,7 +259,6 @@ import { throttle } from 'lodash-es';
     window.updateDomName = function () {
         if (isTraversing || rootNodes.size === 0) return;
         
-        console.time("update dom");
         isTraversing = true;
         
         try {
@@ -271,19 +268,15 @@ import { throttle } from 'lodash-es';
             // 遍历所有 React root 节点
             rootNodes.forEach(rootNode => {
                 if (rootNode) {
-                    console.log('🌲 Traversing root:', rootNode);
                     traverseFiberTree(rootNode);
                 }
             });
             
             // 应用 className 更新
             applyClassNameUpdates();
-            console.log('📊 Processed', rootNodes.size, 'root(s), updated', nodeToClassListCache.size, 'elements');
         } catch (error) {
-            console.error("Error updating DOM names:", error);
         } finally {
             isTraversing = false;
-            console.timeEnd("update dom");
         }
     };
     
@@ -333,21 +326,17 @@ import { throttle } from 'lodash-es';
             // 当根节点卸载时，从集合中移除
             if (root && root.current) {
                 rootNodes.delete(root.current);
-                console.log('🗑️ Removed root node, remaining roots:', rootNodes.size);
             }
         },
         onPostCommitFiberRoot(_, root) {
-            console.log('🔄 React commit detected, root:', root);
             
             // 添加到 root 节点集合中
             if (root && root.current) {
                 rootNodes.add(root.current);
-                console.log('📌 Added root node, total roots:', rootNodes.size);
                 
                 // 检查是否是 Portal 根节点
                 const containerInfo = root.containerInfo;
                 if (containerInfo && containerInfo !== document.body && containerInfo !== document.documentElement) {
-                    console.log('🌀 Portal root detected, container:', containerInfo);
                 }
             }
             
@@ -395,7 +384,6 @@ import { throttle } from 'lodash-es';
             // 处理当前节点（不管是否跳过）
             processNode(node);
         } catch (error) {
-            console.warn("Error processing fiber node:", error, node);
         }
         
         // 递归遍历子节点和兄弟节点（与原版相同）
@@ -411,7 +399,6 @@ import { throttle } from 'lodash-es';
     function processNode(node) {
         // 特殊处理：Portal 节点
         if (node.tag === HostPortal) {
-            console.log('🌀 Processing Portal node:', node);
             // Portal 节点本身不需要处理，但要确保遍历其子节点
             return;
         }
@@ -457,7 +444,6 @@ import { throttle } from 'lodash-es';
                         }
 
                         nodeToClassListCache.set(nodes[0], classList);
-                        console.log('🏷️ Added className:', cleanModuleName, '(from:', moduleName, ') to', nodes[0].tagName);
                     }
                 }
             }
@@ -481,7 +467,6 @@ import { throttle } from 'lodash-es';
                     nodes[0].__props = nodes[0].__props || {};
                     nodes[0].__props[displayName] = node.memoizedProps; // 保存原始名称作为 key
                     nodeToClassListCache.set(nodes[0], classList);
-                    console.log('🏷️ Added className:', cleanDisplayName, '(from:', displayName, ') to', nodes[0].tagName);
                 }
             }
         }
@@ -520,7 +505,6 @@ import { throttle } from 'lodash-es';
                 })
                 .filter(Boolean);
         } catch (err) {
-            console.warn("Error finding host nodes for fiber:", err, fiber);
             return [];
         }
     }
@@ -591,18 +575,9 @@ import { throttle } from 'lodash-es';
     window.reactDevDisplayNameHelpers = {
         // 快速诊断函数
         diagnose() {
-            console.log('🔧 Running diagnostics...');
-            console.log('1. Hook installed:', !!window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
-            console.log('2. Root nodes count:', rootNodes.size);
-            console.log('3. Root nodes:', Array.from(rootNodes));
-            console.log('4. Cache stats:', this.getCacheStats());
-            console.log('5. Performance stats:', this.getPerformanceStats());
-            
             if (rootNodes.size > 0) {
-                console.log('6. Forcing update...');
                 this.forceUpdate();
             } else {
-                console.log('❌ No root nodes found - React may not have rendered yet');
             }
             
             return {
@@ -624,7 +599,6 @@ import { throttle } from 'lodash-es';
         clearAllCaches() {
             nodeToClassListCache.clear();
             nameMatchCache.clear();
-            console.log('All caches cleared');
         },
         
         // 手动触发更新
@@ -657,9 +631,6 @@ import { throttle } from 'lodash-es';
         
         // 测试类名清理函数
         testSanitizeClassName(name) {
-            console.log('🧪 Testing className sanitization:');
-            console.log('Input:', name);
-            console.log('Output:', sanitizeClassName(name));
             return sanitizeClassName(name);
         },
         
@@ -691,7 +662,6 @@ import { throttle } from 'lodash-es';
         
         // 手动扫描新的根节点
         scanForNewRoots() {
-            console.log('🔍 Manual scanning for new React roots...');
             scanForNewRoots();
         },
         
@@ -700,13 +670,11 @@ import { throttle } from 'lodash-es';
             if (enabled) {
                 if (!this._scanInterval) {
                     this._scanInterval = setInterval(scanForNewRoots, 5000);
-                    console.log('✅ Auto scan enabled (5s interval)');
                 }
             } else {
                 if (this._scanInterval) {
                     clearInterval(this._scanInterval);
                     this._scanInterval = null;
-                    console.log('❌ Auto scan disabled');
                 }
             }
         }
@@ -770,7 +738,6 @@ import { throttle } from 'lodash-es';
                     Object.keys(node).some(key => key.startsWith('__reactInternalInstance') || key.startsWith('__reactFiber'));
                 
                 if (isPortalContainer) {
-                    console.log('🌀 Detected Portal container:', node.className || node.tagName, node);
                     hasNewPortals = true;
                 }
                 
@@ -779,7 +746,6 @@ import { throttle } from 'lodash-es';
                     const reactElements = node.querySelectorAll('*');
                     for (let el of reactElements) {
                         if (Object.keys(el).some(key => key.startsWith('__reactInternalInstance') || key.startsWith('__reactFiber'))) {
-                            console.log('🔍 Found React element in new DOM:', el);
                             hasNewPortals = true;
                             break;
                         }
@@ -791,7 +757,6 @@ import { throttle } from 'lodash-es';
         // 如果检测到新的 Portal，延迟触发更新
         if (hasNewPortals) {
             setTimeout(() => {
-                console.log('🔄 Triggering update due to Portal detection');
                 portalTrigger();
             }, 100);
         }
@@ -823,14 +788,12 @@ import { throttle } from 'lodash-es';
                     if (!rootNodes.has(fiber)) {
                         rootNodes.add(fiber);
                         foundNewRoots = true;
-                        console.log('🆕 Found new root via scanning:', element, fiber);
                     }
                 }
             }
         }
         
         if (foundNewRoots) {
-            console.log('📡 Scan found new roots, triggering update');
             portalTrigger();
         }
     };
@@ -846,9 +809,6 @@ import { throttle } from 'lodash-es';
         nodeToClassListCache.clear();
     });
     
-    console.log('React DevTools Display Name Helper loaded successfully');
-    console.log('🌀 Portal detection enabled');
-    console.log('Use window.reactDevDisplayNameHelpers for debugging utilities');
 })();
 
 
